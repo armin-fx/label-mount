@@ -82,9 +82,9 @@ module label ()
 {
 	difference()
 	{
-		cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], s=wall*0.8
-			,align=Z
-			//,edges_bottom = 0
+		cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], align=Z
+			,edges=wall*0.8
+		//	,edges=configure_edges (default=wall*0.8, bottom=0)
 			);
 		//
 		translate_z (wall)
