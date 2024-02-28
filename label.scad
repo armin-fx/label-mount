@@ -8,7 +8,10 @@ show_magnets = false;
 
 /* [Settings] */
 
-flat = false;
+flat  = false;
+
+split = false;
+show_parts = "both"; // ["both", "bottom", "top"]
 
 /* [Measure] */
 
@@ -20,13 +23,17 @@ slot      = 1.5;
 
 girder_edge_radius = 4;
 
-gap       = 0.05;
-gap_paper = 0.5;
+gap        = 0.1;
+gap_magnet = 0.05;
+gap_paper  = 0.5;
 
 chamfer_factor = 0.8;
 
 magnet_thickness = 1.1;
 magnet_diameter  = 10.1;
+
+snap_width    =  0.5;
+snap_distance = 15;
 
 /* [Hidden] */
 
@@ -45,9 +52,19 @@ magnet_pos =
 
 echo(paper_size, paper_space);
 
+// - Compose object with optional environment:
+
 // object_slice(Z, wall+extra ,extra)
 rotate_x (show_label_only ? 0 : 90)
-label();
+{
+	if (split)
+	{
+		if (show_parts=="both" || show_parts=="top")    split_top()    label();
+		if (show_parts=="both" || show_parts=="bottom") split_bottom() label();
+	}
+	else
+		label();
+}
 
 if (!show_label_only && show_paper)
 {
@@ -87,9 +104,11 @@ if (!show_label_only && show_girder)
 	}
 }
 
+// - Modules:
 
 module label ()
 {
+	color ("gold")
 	difference()
 	{
 		union()
@@ -143,9 +162,76 @@ module label ()
 		// magnet holes
 		place_copy (magnet_pos)
 		translate_z (-extra)
-		cylinder (h=magnet_thickness+gap+extra, d=magnet_diameter+2*gap, $fn=48);
+		cylinder (h=magnet_thickness+gap_magnet+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
 	}
 }
 
-//triangle([3,2], side=0);
+module split_top ()
+{
+	difference()
+	{
+		children();
+		//
+		minkowski()
+		{
+			split_base();
+			sphere (d=gap/2, $fn=12);
+		}
+	}
+}
+
+module split_bottom ()
+{
+	intersection()
+	{
+		children();
+		//
+		minkowski_difference(convexity=3)
+		{
+			split_base();
+			sphere (d=gap/2, $fn=12);
+		}
+	}
+}
+
+module split_base()
+{
+	// paper plate
+	translate_z (-girder_edge_radius -gap -extra)
+	cube_extend ([paper_space.x, paper_space.y, wall+girder_edge_radius +2*gap +2*extra], align=Z);
+	
+	// slot right
+	translate_z (-girder_edge_radius -gap -extra)
+	translate_x (paper_space.x/2-extra)
+	cube_extend ([(label_size.x-paper_space.x)/2 +gap +2*extra, paper_space.y, wall+girder_edge_radius +2*gap +2*extra], align=Z+X);
+	
+	// snap left
+	plain_trace_extrude (
+		[[-paper_space.x/2, +(paper_space.y/2-snap_distance)]
+		,[-paper_space.x/2, -(paper_space.y/2-snap_distance)]
+		] )
+		snap_silhouette ();
+	
+	// snap top and bottom
+	mirror_copy_y()
+	plain_trace_extrude (
+		[[+(paper_space.x/2-snap_distance), +paper_space.y/2]
+		,[-(paper_space.x/2-snap_distance), +paper_space.y/2]
+		] )
+		snap_silhouette ();
+}
+
+module snap_silhouette ()
+{
+	render()
+	difference()
+	{
+		square ([snap_width, wall]);
+		//
+		triangle (snap_width, side=1);
+		//
+		translate_y (wall-snap_width)
+		triangle (snap_width, side=2);
+	}
+}
 
