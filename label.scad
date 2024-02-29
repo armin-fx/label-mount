@@ -162,7 +162,7 @@ module label ()
 		// magnet holes
 		place_copy (magnet_pos)
 		translate_z (-extra)
-		cylinder (h=magnet_thickness+gap_magnet+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
+		cylinder (h=magnet_thickness+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
 	}
 }
 
