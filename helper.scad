@@ -49,14 +49,20 @@ function spread (line, count, width=0, between=false) =
 	         : [ for (i=[0:1:count-2]) lerp (line[0],line[1], width/2 + (i+0.5)*length_segment , length) ]
 ;
 
-module split_both (gap=0)
+// - gap     = the gap between both parts
+// - balance = balance between inner and outer parts '-1 ... 0 ... 1'
+//              0 = carve out both parts half, default
+//             -1 = carve only inner part
+//             +1 = carve only outer part
+module split_both (gap=0, balance=0)
 {
-	split_outer(gap) { children(0); children([1:1:$children-1]); }
-	split_inner(gap) { children(0); children([1:1:$children-1]); }
+	split_outer(gap, balance) { children(0); children([1:1:$children-1]); }
+	split_inner(gap, balance) { children(0); children([1:1:$children-1]); }
 }
 
-module split_outer (gap=0)
+module split_outer (gap=0, balance=0)
 {
+	d = gap * ((balance+1)/2);
 	difference()
 	{
 		 children([1:1:$children-1]);
@@ -64,20 +70,23 @@ module split_outer (gap=0)
 		minkowski(convexity=4)
 		{
 			children(0);
-		//	sphere (d=gap/2, $fn=12);
+			//
+			if (d>0)
+		//	sphere (d=d, $fn=12); /*
 			rotate_extrude($fn=12)
 			difference()
 			{
-				circle(d=gap);
-				translate(-[gap+extra,gap/2+extra])
-				square([gap+extra,gap+2*extra]);
-			}
+				circle(d=d);
+				translate(-[d+extra,d/2+extra])
+				square([d+extra,d+2*extra]);
+			} //*/
 		}
 	}
 }
 
-module split_inner (gap=0)
+module split_inner (gap=0, balance=0)
 {
+	d = gap * ((1-balance)/2);
 	intersection()
 	{
 		 children([1:1:$children-1]);
@@ -85,14 +94,16 @@ module split_inner (gap=0)
 		minkowski_difference(convexity=4)
 		{
 			children(0);
-		//	sphere (d=gap/2, $fn=12);
+			//
+			if (d>0)
+		//	sphere (d=d, $fn=12); /*
 			rotate_extrude($fn=12)
 			difference()
 			{
-				circle(d=gap);
-				translate(-[gap+extra,gap/2+extra])
-				square([gap+extra,gap+2*extra]);
-			}
+				circle(d=d);
+				translate(-[d+extra,d/2+extra])
+				square([d+extra,d+2*extra]);
+			} //*/
 		}
 	}
 }
