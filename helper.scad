@@ -3,6 +3,7 @@ include <banded.scad>
 
 // - Projektspezifische Module:
 
+//                     (wall, snap_width)
 module snap_silhouette (height, width)
 {
 	render()
@@ -17,7 +18,8 @@ module snap_silhouette (height, width)
 	}
 }
 
-module tooth_silhouette (height, depth, width=8, angle=30)
+//                      (wall, wall_side, 5)
+module tooth_silhouette (height, depth, width=5, angle=30)
 {
 	width_top = width + 2*tan(angle)*depth;
 	
@@ -28,6 +30,43 @@ module tooth_silhouette (height, depth, width=8, angle=30)
 		,[-depth, -width_top/2]
 		,[ 0    , -width/2]
 	] );
+}
+
+// Put the connection line along the x axis
+// where the negative y side is the tooth part
+// and the positive y side the plate part.
+// Must use in block with 'combine()'
+//
+//                (length, wall, wall_side, gap, ???)
+module connection (length, height, depth, gap=0, height_extra=0)
+{
+	snap_distance =  3;
+	snap_length   = 10;
+	tooth_length  =  5;
+	//
+	count = ceil( (length-2*snap_distance-tooth_length) / (snap_length+tooth_length+snap_distance*2) );
+	//echo ("connection - count:", count);
+	
+	// Kerbe
+	part_add()
+	for (p = spread([snap_distance,length-snap_distance], count, snap_length, between=true) )
+	{
+		translate_x (p)
+	//	rotate ([90,0,+90])
+		rotate ([90,0,-90])
+		linear_extrude (snap_length, center=true)
+		snap_silhouette (height, snap_width);
+	}
+	
+	// Verzahnung
+	part_add()
+	for (p = spread([snap_distance,length-snap_distance], count, snap_length, between=false) )
+	{
+		translate_x (p)
+		rotate_z (90)
+		translate_z (-gap + (height_extra<0 ? height_extra : 0))
+		tooth_silhouette (height+abs(height_extra)+gap*1.5, depth+gap, tooth_length);
+	}
 }
 
 
@@ -62,10 +101,10 @@ module split_both (gap=0, balance=0)
 
 module split_outer (gap=0, balance=0)
 {
-	d = gap * ((balance+1)/2);
+	d = gap * (balance+1);
 	difference()
 	{
-		 children([1:1:$children-1]);
+		children([1:1:$children-1]);
 		//
 		minkowski(convexity=4)
 		{
@@ -86,10 +125,10 @@ module split_outer (gap=0, balance=0)
 
 module split_inner (gap=0, balance=0)
 {
-	d = gap * ((1-balance)/2);
+	d = gap * (1-balance);
 	intersection()
 	{
-		 children([1:1:$children-1]);
+		children([1:1:$children-1]);
 		//
 		minkowski_difference(convexity=4)
 		{

@@ -23,7 +23,7 @@ slot      = 1.5;
 lattice_diameter = 6;
 lattice_bottom_distance = -2.5;
 
-gap        = 0.15;
+gap        = 0.1;
 gap_paper  = 0.5;
 
 chamfer_factor = 0.8;

@@ -1,4 +1,4 @@
-show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together" ]
+show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together", 4:"Test", 5:"Test split object" ]
 
 /*[Measure]*/
 
@@ -7,7 +7,7 @@ wall      = 1.5;
 wall_side = 2.5;
 slot      = 1.5;
 
-gap=0.15;
+gap=0.1;
 
 snap_width    =  0.5;
 snap_distance = 15;
@@ -28,6 +28,8 @@ select (show_parts)
 	split_outer(gap) { split_base(); model(); }
 	split_inner(gap) { split_base(); model(); }
 	split_both (gap) { split_base(); model(); }
+	test  ();
+	test_2();
 }
 
 
@@ -63,6 +65,8 @@ module split_base() combine()
 	translate (-gap*[1,0,1])
 	cube([length,width-wall_side,wall] + A*2*gap);
 	
+	translate_y (wall_side) connection (length, wall, wall_side, gap, 0); /*
+	
 	// Kerbe
 	snap_distance = 3;
 	snap_length = 10;
@@ -88,5 +92,9 @@ module split_base() combine()
 		translate_z (-gap)
 		tooth_silhouette (wall+gap*1.5, wall_side+gap, 5);
 	}
+	//*/
 }
+
+module test  () { connection (length, wall, wall_side, gap, -1); }
+module test_2() { split_base(); }
 

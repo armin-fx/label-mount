@@ -26,7 +26,7 @@ slot      = 1.5;
 
 girder_edge_radius = 5;
 
-gap        = 0.15;
+gap        = 0.1;
 gap_magnet = 0.05;
 gap_paper  = 0.5;
 
@@ -36,7 +36,6 @@ magnet_thickness = 1.1;
 magnet_diameter  = 10.1;
 
 snap_width    =  0.5;
-snap_distance = 15;
 
 /* [Hidden] */
 
@@ -172,28 +171,51 @@ module label ()
 }
 
 module split_base()
+combine()
 {
 	// paper plate
+	part_main()
 	translate_z (-girder_edge_radius -gap -extra)
 	cube_extend ([paper_space.x, paper_space.y, wall+girder_edge_radius +2*gap +2*extra], align=Z);
 	
 	// slot right
+	part_add()
 	translate_z (-girder_edge_radius -gap -extra)
 	translate_x (paper_space.x/2-extra)
 	cube_extend ([(label_size.x-paper_space.x)/2 +gap +2*extra, paper_space.y, wall+girder_edge_radius +2*gap +2*extra], align=Z+X);
 	
-	// snap left
-	plain_trace_extrude (
-		[[-paper_space.x/2, +(paper_space.y/2-snap_distance)]
-		,[-paper_space.x/2, -(paper_space.y/2-snap_distance)]
-		] )
-		snap_silhouette (wall, snap_width);
+	if (true)
+	{
+		// snap left
+		translate_xy ([-paper_space.x/2, paper_space.y/2])
+		rotate_z(-90)
+		connection (paper_space.y, wall, wall_side, gap, -girder_edge_radius);
+		
+		// snap top and bottom
+		mirror_copy_y()
+		translate_xy ([-paper_space.x/2, -paper_space.y/2])
+		connection (paper_space.x, wall, wall_side, gap, -girder_edge_radius);
+	}
 	
-	// snap top and bottom
-	mirror_copy_y()
-	plain_trace_extrude (
-		[[+(paper_space.x/2-snap_distance), +paper_space.y/2]
-		,[-(paper_space.x/2-snap_distance), +paper_space.y/2]
-		] )
-		snap_silhouette (wall, snap_width);
+	if (false)
+	{
+		snap_distance = 15;
+		
+		// snap left
+		part_add()
+		plain_trace_extrude (
+			[[-paper_space.x/2, +(paper_space.y/2-snap_distance)]
+			,[-paper_space.x/2, -(paper_space.y/2-snap_distance)]
+			] )
+			snap_silhouette (wall, snap_width);
+		
+		// snap top and bottom
+		part_add()
+		mirror_copy_y()
+		plain_trace_extrude (
+			[[+(paper_space.x/2-snap_distance), +paper_space.y/2]
+			,[-(paper_space.x/2-snap_distance), +paper_space.y/2]
+			] )
+			snap_silhouette (wall, snap_width);
+	}
 }
