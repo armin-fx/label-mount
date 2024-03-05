@@ -1,6 +1,9 @@
 
 /* [Display] */
 
+show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together" ]
+
+// if set, the model will lay flat and the other environmental parts will not shown
 show_label_only = true;
 
 show_paper   = true;
@@ -11,7 +14,7 @@ show_magnets = true;
 
 flat  = false;
 
-show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together" ]
+magnets = true;
 
 /* [Measure] */
 
@@ -72,6 +75,7 @@ if (!show_label_only && show_paper)
 	translate_z (wall + 0.1)
 	cube_extend ([paper_size.x, paper_size.y, 0.2], align=Z);
 }
+if (magnets)
 if (!show_label_only && show_magnets)
 {
 	color ("lightgrey") %
@@ -88,6 +92,7 @@ if (!show_label_only && show_girder)
 	wall_girder =   1;
 	
 	color ("blue", 0.5) %
+	render()
 	difference()
 	{
 		cube_rounded ([length,thickness,height]
@@ -159,6 +164,7 @@ module label ()
 		}
 		//
 		// magnet holes
+		if (magnets)
 		place_copy (magnet_pos)
 		translate_z (-extra)
 		cylinder (h=magnet_thickness+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
