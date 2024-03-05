@@ -75,7 +75,7 @@ module split_base() combine()
 	//	rotate ([90,0,+90])
 		rotate ([90,0,-90])
 		linear_extrude (snap_length, center=true)
-		snap_silhouette ();
+		snap_silhouette (wall, snap_width);
 	}
 	
 	// Verzahnung
@@ -89,32 +89,4 @@ module split_base() combine()
 		tooth_silhouette (wall+gap*1.5, wall_side+gap, 5);
 	}
 }
-
-module snap_silhouette ()
-{
-	render()
-	difference()
-	{
-		square ([snap_width, wall]);
-		//
-		triangle (snap_width, side=1);
-		//
-		translate_y (wall-snap_width)
-		triangle (snap_width, side=2);
-	}
-}
-
-module tooth_silhouette (height, depth, width=8, angle=30)
-{
-	width_top = width + 2*tan(angle)*depth;
-	
-	linear_extrude (height)
-	polygon(
-		[[ 0    ,  width/2]
-		,[-depth,  width_top/2]
-		,[-depth, -width_top/2]
-		,[ 0    , -width/2]
-	] );
-}
-
 

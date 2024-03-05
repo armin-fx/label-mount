@@ -181,7 +181,7 @@ module split_base()
 		[[-paper_space.x/2, +(paper_space.y/2-snap_distance)]
 		,[-paper_space.x/2, -(paper_space.y/2-snap_distance)]
 		] )
-		snap_silhouette ();
+		snap_silhouette (wall, snap_width);
 	
 	// snap top and bottom
 	mirror_copy_y()
@@ -189,20 +189,5 @@ module split_base()
 		[[+(paper_space.x/2-snap_distance), +paper_space.y/2]
 		,[-(paper_space.x/2-snap_distance), +paper_space.y/2]
 		] )
-		snap_silhouette ();
+		snap_silhouette (wall, snap_width);
 }
-
-module snap_silhouette ()
-{
-	render()
-	difference()
-	{
-		square ([snap_width, wall]);
-		//
-		triangle (snap_width, side=1);
-		//
-		translate_y (wall-snap_width)
-		triangle (snap_width, side=2);
-	}
-}
-

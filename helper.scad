@@ -3,7 +3,32 @@ include <banded.scad>
 
 // - Projektspezifische Module:
 
+module snap_silhouette (height, width)
+{
+	render()
+	difference()
+	{
+		square ([width, height]);
+		//
+		triangle (width, side=1);
+		//
+		translate_y (height-width)
+		triangle (width, side=2);
+	}
+}
 
+module tooth_silhouette (height, depth, width=8, angle=30)
+{
+	width_top = width + 2*tan(angle)*depth;
+	
+	linear_extrude (height)
+	polygon(
+		[[ 0    ,  width/2]
+		,[-depth,  width_top/2]
+		,[-depth, -width_top/2]
+		,[ 0    , -width/2]
+	] );
+}
 
 
 // - Hilfsmodule, könnten möglicherweise zur Bibliothek hinzugefügt werden:
