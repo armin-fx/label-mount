@@ -11,8 +11,7 @@ show_magnets = true;
 
 flat  = false;
 
-split = false;
-show_parts = "both"; // ["both", "bottom", "top"]
+show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together" ]
 
 /* [Measure] */
 
@@ -39,6 +38,7 @@ snap_distance = 15;
 /* [Hidden] */
 
 include <banded.scad>
+include <helper.scad>
 
 paper_size  = [ISO_A4.x, ISO_A4.y/4];
 paper_space = paper_size + [1,1]*2*gap_paper;
@@ -57,14 +57,12 @@ echo(paper_size, paper_space);
 
 // object_slice(Z, wall+extra ,extra)
 rotate_x (show_label_only ? 0 : 90)
+select (show_parts)
 {
-	if (split)
-	{
-		if (show_parts=="both" || show_parts=="top")    split_top()    label();
-		if (show_parts=="both" || show_parts=="bottom") split_bottom() label();
-	}
-	else
-		label();
+	label();
+	split_outer(gap) { split_base(); label(); }
+	split_inner(gap) { split_base(); label(); }
+	split_both (gap) { split_base(); label(); }
 }
 
 if (!show_label_only && show_paper)
@@ -164,34 +162,6 @@ module label ()
 		place_copy (magnet_pos)
 		translate_z (-extra)
 		cylinder (h=magnet_thickness+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
-	}
-}
-
-module split_top ()
-{
-	difference()
-	{
-		children();
-		//
-		minkowski()
-		{
-			split_base();
-			sphere (d=gap/2, $fn=12);
-		}
-	}
-}
-
-module split_bottom ()
-{
-	intersection()
-	{
-		children();
-		//
-		minkowski_difference(convexity=3)
-		{
-			split_base();
-			sphere (d=gap/2, $fn=12);
-		}
 	}
 }
 
