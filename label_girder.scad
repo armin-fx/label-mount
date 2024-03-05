@@ -10,11 +10,18 @@ show_paper   = true;
 show_girder  = true;
 show_magnets = true;
 
+/* [3D Print] */
+
+// this has only an effect if setting show_label_only is set
+lay_flat = false;
+
 /* [Settings] */
 
 flat  = false;
 
 magnets = true;
+
+save_space = false;
 
 /* [Measure] */
 
@@ -53,12 +60,14 @@ magnet_pos =
 	,[-paper_space.x/3,paper_space.y/8]
 	];
 
-echo(paper_size, paper_space);
-
 // - Compose object with optional environment:
 
 // object_slice(Z, wall+extra ,extra)
-rotate_x (show_label_only ? 0 : 90)
+rotate_x (
+	show_label_only ?
+		lay_flat ? 180
+		         :   0
+	: 90 )
 select (show_parts)
 {
 	label();
@@ -167,6 +176,37 @@ module label ()
 		place_copy (magnet_pos)
 		translate_z (-extra)
 		cylinder (h=magnet_thickness+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
+		//
+		// save space - generate a grid on backplate with half wall
+		space_height    = wall/2;
+		steg_width      = wall * 2;
+		honeycomb_width = 10;
+		segment         = steg_width+honeycomb_width;
+		k = cos(30);
+		if (save_space)
+		difference()
+		{
+			intersection()
+			{
+				// honeycomp
+				for (x=[0 : segment : paper_size.x/2]) mirror_copy_x()
+				place_copy ([[-segment/2,-segment/2*k,0],[0,+segment/2*k,0]])
+				for (y=[0 : 2*segment*k : paper_size.y/2]) mirror_copy_y()
+					translate ([x,y, -extra])
+					rotate_z  (30)
+					cylinder_extend (h=space_height+extra, d=honeycomb_width, slices=6, outer=1);
+				//
+				// restrict boundary
+				translate_z (-extra)
+				cube_extend ([paper_size.x-steg_width, paper_size.y-steg_width*2, wall+extra], align=Z);
+				//
+			}
+			// cut elements
+			if (magnets)
+			place_copy (magnet_pos)
+			translate_z (-extra)
+			cylinder (h=space_height+2*extra, d=magnet_diameter+2*(gap_magnet+steg_width+2), $fn=48);
+		}
 	}
 }
 

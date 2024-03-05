@@ -42,8 +42,6 @@ label_size  = [paper_size.x+2*wall_side, height];
 
 chamfer = chamfer_factor * wall;
 
-echo(paper_size, paper_space);
-
 // - Compose object with optional environment:
 
 // object_slice(Z, wall+extra ,extra)

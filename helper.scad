@@ -102,6 +102,8 @@ module split_both (gap=0, balance=0)
 module split_outer (gap=0, balance=0)
 {
 	d = gap * (balance+1);
+	n = get_slices_circle_current_x (d/2, $fn_min=12);
+	//
 	difference()
 	{
 		children([1:1:$children-1]);
@@ -112,7 +114,7 @@ module split_outer (gap=0, balance=0)
 			//
 			if (d>0)
 		//	sphere (d=d, $fn=12); /*
-			rotate_extrude($fn=12)
+			rotate_extrude ($fn=n)
 			difference()
 			{
 				circle(d=d);
@@ -126,6 +128,8 @@ module split_outer (gap=0, balance=0)
 module split_inner (gap=0, balance=0)
 {
 	d = gap * (1-balance);
+	n = get_slices_circle_current_x (d/2, $fn_min=12);
+	//
 	intersection()
 	{
 		children([1:1:$children-1]);
@@ -136,7 +140,7 @@ module split_inner (gap=0, balance=0)
 			//
 			if (d>0)
 		//	sphere (d=d, $fn=12); /*
-			rotate_extrude($fn=12)
+			rotate_extrude ($fn=n)
 			difference()
 			{
 				circle(d=d);
