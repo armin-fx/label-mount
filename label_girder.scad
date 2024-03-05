@@ -21,7 +21,7 @@ wall      = 1.5;
 wall_side = 2.5;
 slot      = 1.5;
 
-girder_edge_radius = 4;
+girder_edge_radius = 5;
 
 gap        = 0.15;
 gap_magnet = 0.05;
