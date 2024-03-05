@@ -142,41 +142,12 @@ module label ()
 module split_base()
 {
 	// paper plate
-	translate_z (-girder_edge_radius -gap -extra)
-	cube_extend ([paper_space.x, paper_space.y, wall+girder_edge_radius +2*gap +2*extra], align=Z);
 	
 	// slot right
-	translate_z (-girder_edge_radius -gap -extra)
-	translate_x (paper_space.x/2-extra)
-	cube_extend ([(label_size.x-paper_space.x)/2 +gap +2*extra, paper_space.y, wall+girder_edge_radius +2*gap +2*extra], align=Z+X);
 	
 	// snap left
-	plain_trace_extrude (
-		[[-paper_space.x/2, +(paper_space.y/2-snap_distance)]
-		,[-paper_space.x/2, -(paper_space.y/2-snap_distance)]
-		] )
-		snap_silhouette ();
 	
 	// snap top and bottom
-	mirror_copy_y()
-	plain_trace_extrude (
-		[[+(paper_space.x/2-snap_distance), +paper_space.y/2]
-		,[-(paper_space.x/2-snap_distance), +paper_space.y/2]
-		] )
-		snap_silhouette ();
 }
 
-module snap_silhouette ()
-{
-	render()
-	difference()
-	{
-		square ([snap_width, wall]);
-		//
-		triangle (snap_width, side=1);
-		//
-		translate_y (wall-snap_width)
-		triangle (snap_width, side=2);
-	}
-}
 
