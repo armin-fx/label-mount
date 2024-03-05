@@ -7,7 +7,7 @@ wall      = 1.5;
 wall_side = 2.5;
 slot      = 1.5;
 
-gap=0.1;
+gap=0.15;
 
 snap_width    =  0.5;
 snap_distance = 15;

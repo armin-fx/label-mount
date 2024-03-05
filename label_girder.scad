@@ -23,7 +23,7 @@ slot      = 1.5;
 
 girder_edge_radius = 4;
 
-gap        = 0.1;
+gap        = 0.15;
 gap_magnet = 0.05;
 gap_paper  = 0.5;
 
