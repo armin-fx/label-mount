@@ -25,6 +25,7 @@ lattice_bottom_distance = -2.5;
 
 gap        = 0.1;
 gap_paper  = 0.5;
+gap_clips  = 0.2;
 
 chamfer_factor = 0.8;
 
@@ -38,6 +39,8 @@ include <helper.scad>
 paper_size  = [90, 90/3];
 paper_space = paper_size + [1,1]*2*gap_paper;
 label_size  = [paper_size.x+2*wall_side, height];
+
+label_height = wall + slot + wall;
 
 chamfer = chamfer_factor * wall;
 
@@ -69,7 +72,8 @@ if (!show_label_only && show_lattice)
 	lattice_height          = 41;
 	
 	color ("lightgrey", 0.5) %
-	translate ([0, lattice_bottom_distance, lattice_diameter])
+//	translate ([0, 0                      , lattice_diameter/4])
+	translate ([0, lattice_bottom_distance, lattice_diameter  ])
 	union()
 	{
 		translate_z (label_size.y/2)
@@ -106,11 +110,71 @@ module label ()
 			cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], align=Z
 				,edges= flat==true
 					? configure_edges (default=1, r=chamfer, bottom=1)
-					: configure_edges (default=1, r=chamfer, bottom=[0,1,0,1])
+					: configure_edges (default=1, r=chamfer, bottom=[0,1,1,1])
 				);
 			
 			// clips
-			if (!flat) empty();
+			if (!flat)
+			{
+				clips_width = 10;
+				clips_angle = 180 + 10;
+				//
+				$fd = 0.02;
+				under = wall*chamfer_factor;
+				side_dist = label_height+lattice_bottom_distance;
+				chamfer_dist = chamfer * sqrt(1/2);
+				lattice_angle =
+					270 - atan(
+						(  lattice_diameter/2 + lattice_bottom_distance + chamfer_dist)
+						/ (lattice_diameter/2)
+					) ;
+				//
+				mirror_copy_x()
+				// position on side
+				translate_x (paper_space.x/2 * (1-1/euler))
+				// position on upper side at front side
+				translate   ([0,label_size.y/2,label_height])
+				combine()
+				{
+					part_add()
+					translate_y (-under)
+					cube_extend ([clips_width,lattice_diameter/2+under,side_dist], align=-Z+Y);
+					
+					lattice_pos = [0,lattice_diameter/2,-side_dist-lattice_diameter/2];
+					
+					union()
+					{
+						part_add()
+						translate (lattice_pos)  rotate_to_vector (X)
+						cylinder_extend (h=clips_width, d=lattice_diameter+2*side_dist
+							, angle=[-clips_angle,lattice_angle]
+							, center=true );
+						//
+						part_selfcut()
+						cube_extend ([clips_width+2*extra,side_dist,label_height], align=-Z-Y);
+						//
+						part_selfcut()
+						translate   ([0,-chamfer_dist,-label_height])
+						cube_extend ([clips_width+2*extra,chamfer+lattice_diameter/2,chamfer_dist], align=+Z+Y);
+					}
+					//
+					part_selfcut_all()
+					translate (lattice_pos)  rotate_to_vector (X)
+					cylinder_extend (h=clips_width+2*extra, d=lattice_diameter+2*gap_clips
+						, angle=[-clips_angle,lattice_angle]
+						, piece=clips_angle<180
+						, center=true );
+					//
+					part_add()
+					translate (lattice_pos)  rotate_to_vector (X)
+					rotate_z    (lattice_angle-clips_angle)
+					translate_x (lattice_diameter/2+gap_clips)
+					cylinder_extend (h=clips_width, d=side_dist-gap_clips
+						, angle=[180,180]
+						, align=X );
+					
+				}
+			}
 		}
 		//
 		// paper slot
