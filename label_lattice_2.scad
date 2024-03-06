@@ -1,16 +1,22 @@
 
 /* [Display] */
 
+show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together" ]
+
+// if set, the model will lay flat and the other environmental parts will not shown
 show_label_only = true;
 
 show_paper   = true;
 show_lattice = true;
 
+/* [3D Print] */
+
+// This has only an effect if setting show_label_only is set
+lay_flat = false;
+
 /* [Settings] */
 
 flat  = false;
-
-show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together" ]
 
 /* [Measure] */
 
@@ -47,7 +53,11 @@ required_version ([2,2,0]);
 // - Compose object with optional environment:
 
 // object_slice(Z, wall+extra ,extra)
-rotate_x (show_label_only ? 0 : 90)
+rotate_x (
+	show_label_only ?
+		lay_flat ? 180
+		         :   0
+	: 90 )
 select (show_parts)
 {
 	label();

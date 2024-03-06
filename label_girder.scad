@@ -34,8 +34,8 @@ slot      = 1.5;
 girder_edge_radius = 5;
 
 gap        = 0.1;
-gap_magnet = 0.05;
 gap_paper  = 0.5;
+gap_magnet = 0.05;
 
 chamfer_factor = 0.8;
 
