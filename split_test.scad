@@ -9,8 +9,7 @@ slot      = 1.5;
 
 gap=0.1;
 
-snap_width    =  0.5;
-snap_distance = 15;
+snap_depth    =  0.5;
 
 length=100;
 width=20;
@@ -65,7 +64,7 @@ module split_base() combine()
 	translate (-gap*[1,0,1])
 	cube([length,width-wall_side,wall] + A*2*gap);
 	
-	translate_y (wall_side) connection (length, wall, wall_side, gap, 0); /*
+	translate_y (wall_side) connection (length, wall, wall_side, snap_depth, gap, 0); /*
 	
 	// Kerbe
 	snap_distance = 3;
@@ -79,7 +78,7 @@ module split_base() combine()
 	//	rotate ([90,0,+90])
 		rotate ([90,0,-90])
 		linear_extrude (snap_length, center=true)
-		snap_silhouette (wall, snap_width);
+		snap_silhouette (wall, snap_depth);
 	}
 	
 	// Verzahnung

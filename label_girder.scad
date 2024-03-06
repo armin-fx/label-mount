@@ -12,7 +12,7 @@ show_magnets = true;
 
 /* [3D Print] */
 
-// this has only an effect if setting show_label_only is set
+// This has only an effect if setting show_label_only is set
 lay_flat = false;
 
 /* [Settings] */
@@ -21,7 +21,7 @@ flat  = false;
 
 magnets = true;
 
-save_space = false;
+save_space = true;
 
 /* [Measure] */
 
@@ -39,10 +39,15 @@ gap_paper  = 0.5;
 
 chamfer_factor = 0.8;
 
-magnet_thickness = 1.1;
+magnet_thickness = 1.0;
 magnet_diameter  = 10.1;
 
-snap_width    =  0.5;
+snap_depth    =  0.5;
+
+// The width of a honeycomp from space pattern if save_space is enabled
+honeycomb_width = 8;
+// The ratio depth of space to wall thickness in percent. 0% = no space, 100% = hollow space pattern
+space_depth_ratio = 50 ;
 
 /* [Hidden] */
 
@@ -178,12 +183,11 @@ module label ()
 		cylinder (h=magnet_thickness+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
 		//
 		// save space - generate a grid on backplate with half wall
-		space_height    = wall/2;
-		steg_width      = wall * 2;
-		honeycomb_width = 10;
+		space_height    = wall * space_depth_ratio*percent;
+		steg_width      = wall * 1.5;
 		segment         = steg_width+honeycomb_width;
 		k = cos(30);
-		if (save_space)
+		if (save_space && space_height>0)
 		difference()
 		{
 			intersection()
@@ -191,7 +195,7 @@ module label ()
 				// honeycomp
 				for (x=[0 : segment : paper_size.x/2]) mirror_copy_x()
 				place_copy ([[-segment/2,-segment/2*k,0],[0,+segment/2*k,0]])
-				for (y=[0 : 2*segment*k : paper_size.y/2]) mirror_copy_y()
+				for (y=[0 : 2*segment*k : paper_size.y/2+segment*k]) mirror_copy_y()
 					translate ([x,y, -extra])
 					rotate_z  (30)
 					cylinder_extend (h=space_height+extra, d=honeycomb_width, slices=6, outer=1);
@@ -229,12 +233,12 @@ combine()
 		// snap left
 		translate_xy ([-paper_space.x/2, paper_space.y/2])
 		rotate_z(-90)
-		connection (paper_space.y, wall, wall_side, gap, -girder_edge_radius);
+		connection (paper_space.y, wall, wall_side, snap_depth, gap, -girder_edge_radius);
 		
 		// snap top and bottom
 		mirror_copy_y()
 		translate_xy ([-paper_space.x/2, -paper_space.y/2])
-		connection (paper_space.x, wall, wall_side, gap, -girder_edge_radius);
+		connection (paper_space.x, wall, wall_side, snap_depth, gap, -girder_edge_radius);
 	}
 	
 	if (false)
@@ -247,7 +251,7 @@ combine()
 			[[-paper_space.x/2, +(paper_space.y/2-snap_distance)]
 			,[-paper_space.x/2, -(paper_space.y/2-snap_distance)]
 			] )
-			snap_silhouette (wall, snap_width);
+			snap_silhouette (wall, snap_depth);
 		
 		// snap top and bottom
 		part_add()
@@ -256,6 +260,6 @@ combine()
 			[[+(paper_space.x/2-snap_distance), +paper_space.y/2]
 			,[-(paper_space.x/2-snap_distance), +paper_space.y/2]
 			] )
-			snap_silhouette (wall, snap_width);
+			snap_silhouette (wall, snap_depth);
 	}
 }

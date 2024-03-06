@@ -3,7 +3,7 @@ include <banded.scad>
 
 // - Projektspezifische Module:
 
-//                     (wall, snap_width)
+//                     (wall, snap_depth)
 module snap_silhouette (height, width)
 {
 	render()
@@ -37,8 +37,8 @@ module tooth_silhouette (height, depth, width=5, angle=30)
 // and the positive y side the plate part.
 // Must use in block with 'combine()'
 //
-//                (length, wall, wall_side, gap, ???)
-module connection (length, height, depth, gap=0, height_extra=0)
+//                (length, wall, wall_side, snap_depth, gap, ???)
+module connection (length, height, depth, snap_depth, gap=0, height_extra=0)
 {
 	snap_distance =  3;
 	snap_length   = 10;
@@ -55,7 +55,7 @@ module connection (length, height, depth, gap=0, height_extra=0)
 	//	rotate ([90,0,+90])
 		rotate ([90,0,-90])
 		linear_extrude (snap_length, center=true)
-		snap_silhouette (height, snap_width);
+		snap_silhouette (height, snap_depth);
 	}
 	
 	// Verzahnung

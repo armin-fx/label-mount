@@ -28,8 +28,7 @@ gap_paper  = 0.5;
 
 chamfer_factor = 0.8;
 
-snap_width    =  0.5;
-snap_distance = 15;
+snap_depth    =  0.5;
 
 /* [Hidden] */
 
