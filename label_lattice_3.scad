@@ -37,6 +37,8 @@ chamfer_factor = 0.8;
 
 snap_depth    =  0.5;
 
+clips_width = 10;
+
 /* [Hidden] */
 
 include <banded.scad>
@@ -49,6 +51,8 @@ label_size  = [paper_size.x+2*wall_side, height];
 label_height = wall + slot + wall;
 
 chamfer = chamfer_factor * wall;
+
+clips_position = paper_space.x/2 * 3/5 ; // * (1-1/euler);
 
 // test BandedScad version
 required_version ([2,2,0]);
@@ -123,14 +127,12 @@ module label ()
 			cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], align=Z
 				,edges= flat==true
 					? configure_edges (default=1, r=chamfer, bottom=1)
-					: configure_edges (default=1, r=chamfer, bottom=[0,1,1,1])
+					: configure_edges (default=1, r=chamfer, bottom=[1,1,1,1])
 				);
 			
 			// clips
 			if (!flat)
 			{
-				clips_width = 10;
-				//
 				$fd = $preview ? 0.02 : 0.005;
 				under                = wall*chamfer_factor;
 				side_dist            = label_height+lattice_bottom_distance;
@@ -146,11 +148,10 @@ module label ()
 						(  lattice_diameter/2 + lattice_bottom_distance + chamfer_dist)
 						/ (lattice_diameter/2)
 					) ;
-				echo ("clips angle:", clips_angle_gap, clips_angle, clips_angle_begin);
 				
 				mirror_copy_x()
 				// position on side
-				translate_x (paper_space.x/2 * (1-1/euler))
+				translate_x (clips_position)
 				// position on upper side at front side
 				translate   ([0,label_size.y/2,label_height])
 				combine()
@@ -242,13 +243,31 @@ module label ()
 }
 
 module split_base()
+combine()
 {
 	// paper plate
+	part_main()
+	translate_z (-gap -extra)
+	cube_extend ([paper_space.x, paper_space.y, wall +2*gap +2*extra], align=Z);
 	
 	// slot right
+	part_add()
+	translate_z (-gap -extra)
+	translate_x (paper_space.x/2-extra)
+	cube_extend ([(label_size.x-paper_space.x)/2 +gap +2*extra, paper_space.y, wall +2*gap +2*extra], align=Z+X);
 	
 	// snap left
+	translate_xy ([-paper_space.x/2, paper_space.y/2])
+	rotate_z(-90)
+	connection (paper_space.y, wall, wall_side, snap_depth, gap);
 	
-	// snap top and bottom
+	// bottom
+	translate_xy ([-paper_space.x/2, -paper_space.y/2])
+	connection (paper_space.x, wall, wall_side, snap_depth, gap);
+	
+	// snap top
+	translate_xy ([paper_space.x/2, paper_space.y/2])
+	rotate_z(180)
+	connection (paper_space.x, wall, wall_side, snap_depth, gap);
 }
 

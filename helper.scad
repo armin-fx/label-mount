@@ -47,9 +47,16 @@ module connection (length, height, depth, snap_depth, gap=0, height_extra=0)
 	count = ceil( (length-2*snap_distance-tooth_length) / (snap_length+tooth_length+snap_distance*2) );
 	//echo ("connection - count:", count);
 	
+	pos_snap  = count==1
+		? [(snap_distance + length-snap_distance) / 2]
+		: spread ([snap_distance,length-snap_distance], count, snap_length, between=true);
+	pos_tooth = count==1
+		? []
+		: spread ([snap_distance,length-snap_distance], count, snap_length, between=false);
+	
 	// Kerbe
 	part_add()
-	for (p = spread([snap_distance,length-snap_distance], count, snap_length, between=true) )
+	for (p = pos_snap)
 	{
 		translate_x (p)
 	//	rotate ([90,0,+90])
@@ -60,7 +67,7 @@ module connection (length, height, depth, snap_depth, gap=0, height_extra=0)
 	
 	// Verzahnung
 	part_add()
-	for (p = spread([snap_distance,length-snap_distance], count, snap_length, between=false) )
+	for (p = pos_tooth)
 	{
 		translate_x (p)
 		rotate_z (90)
@@ -78,7 +85,10 @@ module connection (length, height, depth, snap_depth, gap=0, height_extra=0)
 // Position ist die Mitte von width
 function spread (line, count, width=0, between=false) =
 	(count==undef || count<0) ? undef :
-	count==1 ? [(line[0]+line[1]) / 2] :
+	count==1 ?
+		between ? []
+		        : [(line[0]+line[1]) / 2]
+	:
 	let(
 		 length         = is_num(line[0]) ?       line[1]-line[0]
 		                                  : norm (line[1]-line[0])
