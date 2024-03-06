@@ -44,6 +44,9 @@ label_height = wall + slot + wall;
 
 chamfer = chamfer_factor * wall;
 
+// test BandedScad version
+required_version ([2,2,0]);
+
 // - Compose object with optional environment:
 
 // object_slice(Z, wall+extra ,extra)

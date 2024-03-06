@@ -19,6 +19,9 @@ width=20;
 include <banded.scad>
 include <helper.scad>
 
+// test BandedScad version
+required_version ([2,2,0]);
+
 //!tooth_silhouette(wall, wall_side);
 
 select (show_parts)

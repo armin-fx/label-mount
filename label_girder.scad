@@ -65,6 +65,9 @@ magnet_pos =
 	,[-paper_space.x/3,paper_space.y/8]
 	];
 
+// test BandedScad version
+required_version ([2,2,0]);
+
 // - Compose object with optional environment:
 
 // object_slice(Z, wall+extra ,extra)

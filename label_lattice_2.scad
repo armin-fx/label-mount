@@ -41,6 +41,9 @@ label_size  = [paper_size.x+2*wall_side, height];
 
 chamfer = chamfer_factor * wall;
 
+// test BandedScad version
+required_version ([2,2,0]);
+
 // - Compose object with optional environment:
 
 // object_slice(Z, wall+extra ,extra)
