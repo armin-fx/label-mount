@@ -130,18 +130,24 @@ module label ()
 			if (!flat)
 			{
 				clips_width = 10;
-				clips_angle = 180 + 10;
 				//
-				$fd = 0.02;
-				under = wall*chamfer_factor;
-				side_dist = label_height+lattice_bottom_distance;
-				chamfer_dist = chamfer * sqrt(1/2);
-				lattice_angle =
+				$fd = $preview ? 0.02 : 0.005;
+				under                = wall*chamfer_factor;
+				side_dist            = label_height+lattice_bottom_distance;
+				chamfer_dist         = chamfer * sqrt(1/2);
+				clips_outer_diameter = lattice_diameter + 2*side_dist;
+				//
+				bevel_angle = 45;
+				//
+				clips_angle_gap   = 2 * acos( lattice_diameter / (lattice_diameter+2*gap_clips) );
+				clips_angle       = 180 + clips_angle_gap;
+				clips_angle_begin =
 					270 - atan(
 						(  lattice_diameter/2 + lattice_bottom_distance + chamfer_dist)
 						/ (lattice_diameter/2)
 					) ;
-				//
+				echo ("clips angle:", clips_angle_gap, clips_angle, clips_angle_begin);
+				
 				mirror_copy_x()
 				// position on side
 				translate_x (paper_space.x/2 * (1-1/euler))
@@ -149,18 +155,21 @@ module label ()
 				translate   ([0,label_size.y/2,label_height])
 				combine()
 				{
+					// part to remove the chamfered edge of the label
+					// and get a straight part to the round clips
 					part_add()
 					translate_y (-under)
 					cube_extend ([clips_width,lattice_diameter/2+under,side_dist], align=-Z+Y);
 					
 					lattice_pos = [0,lattice_diameter/2,-side_dist-lattice_diameter/2];
 					
+					// round clips part
 					union()
 					{
 						part_add()
 						translate (lattice_pos)  rotate_to_vector (X)
-						cylinder_extend (h=clips_width, d=lattice_diameter+2*side_dist
-							, angle=[-clips_angle,lattice_angle]
+						cylinder_extend (h=clips_width, d=clips_outer_diameter
+							, angle=[-clips_angle, clips_angle_begin]
 							, center=true );
 						//
 						part_selfcut()
@@ -170,21 +179,39 @@ module label ()
 						translate   ([0,-chamfer_dist,-label_height])
 						cube_extend ([clips_width+2*extra,chamfer+lattice_diameter/2,chamfer_dist], align=+Z+Y);
 					}
+					// bevel edge for better printing in flat position
+					part_add()
+					rotate_to_vector (X)
+					linear_extrude (height=clips_width, center=true)
+					polygon(
+						[[0,lattice_diameter/2]
+						,[0,lattice_diameter/2 + clips_outer_diameter/2*tan(bevel_angle/2)]
+						,rotate_at_z_points ([[0,lattice_diameter/2]], -bevel_angle, [clips_outer_diameter/2,lattice_diameter/2] ) [0]
+						,[clips_outer_diameter/2,lattice_diameter/2]
+						] );//*/
 					//
+					// cut lattice out with gap
 					part_selfcut_all()
 					translate (lattice_pos)  rotate_to_vector (X)
 					cylinder_extend (h=clips_width+2*extra, d=lattice_diameter+2*gap_clips
-						, angle=[-clips_angle,lattice_angle]
+						, angle=[-clips_angle, clips_angle_begin]
 						, piece=clips_angle<180
 						, center=true );
 					//
+					// clips rounded end
 					part_add()
 					translate (lattice_pos)  rotate_to_vector (X)
-					rotate_z    (lattice_angle-clips_angle)
+					rotate_z    (clips_angle_begin-clips_angle)
 					translate_x (lattice_diameter/2+gap_clips)
-					cylinder_extend (h=clips_width, d=side_dist-gap_clips
-						, angle=[180,180]
-						, align=X );
+					union ()
+					{
+						cylinder_extend (h=clips_width, d=side_dist-gap_clips
+							, angle=[180-clips_angle_gap, 180+clips_angle_gap]
+							, align=X );
+						cylinder_extend (h=clips_width, d=side_dist-gap_clips
+							, angle=[    clips_angle_gap, 180]
+							, align=X, slices=1 );
+					}
 					
 				}
 			}
