@@ -128,9 +128,6 @@ module label ()
 						/ (clips_diameter/2)
 					) ;
 				
-				echo ("clips wall", side_dist);
-				echo ("clips angle", clips_angle, clips_angle_gap, clips_angle_begin);
-				
 				mirror_copy_x()
 				// position on side
 				translate_x (clips_position)
