@@ -20,10 +20,13 @@ show_magnets = true;
 
 /* [Settings] */
 
-flat  = false;
+// If set, generate no snag into the rounded edge from the girder
+flat = false;
 
 magnets = true;
+magnet_count = 2;
 
+// If set, generate a groundplate with thinner honeycomp spaces
 save_space = true;
 
 /* [Measure] */
@@ -64,9 +67,22 @@ label_size  = [paper_size.x+2*wall_side, height];
 chamfer = chamfer_factor * wall;
 
 magnet_pos =
-	[[+paper_space.x/3,paper_space.y/8]
-	,[-paper_space.x/3,paper_space.y/8]
-	];
+	magnet_count==2 ?
+		[[+paper_space.x/3,paper_space.y/8]
+		,[-paper_space.x/3,paper_space.y/8]
+		]:
+	magnet_count==3 ?
+		[[+paper_space.x/3, paper_space.y/4]
+		,[ 0              ,-paper_space.y/4]
+		,[-paper_space.x/3, paper_space.y/4]
+		]:
+	magnet_count==4 ?
+		[[+paper_space.x/3, paper_space.y/8]
+		,[ 0              , paper_space.y/4]
+		,[ 0              ,-paper_space.y/4]
+		,[-paper_space.x/3, paper_space.y/8]
+		]:
+	[];
 
 // test BandedScad version
 required_version ([2,2,0]);
