@@ -1,0 +1,20 @@
+{
+    "parameterSets": {
+        "Printable, Complete": {
+            "show_parts": "0",
+            "show_label_only": "true",
+            "lay_flat": "true"
+        },
+        "Printable, Top part": {
+            "show_parts": "1",
+            "show_label_only": "true",
+            "lay_flat": "true"
+        },
+        "Printable, Bottom part": {
+            "show_parts": "2",
+            "show_label_only": "true",
+            "lay_flat": "true"
+        }
+    },
+    "fileFormatVersion": "1"
+}
