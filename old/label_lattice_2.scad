@@ -1,22 +1,25 @@
+// This will create a label for a refrigerator,
+// mounted on a strut from the lattice.
+//
 
-/* [Display] */
+/* [3D Print] */
 
 show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together" ]
 
 // if set, the model will lay flat and the other environmental parts will not shown
-show_label_only = true;
+show_label_only = false;
+
+// If set, this will rotate this object 3d printable. (available if setting show_label_only is set)
+lay_flat        = false;
+
+/* [Display] */
 
 show_paper   = true;
 show_lattice = true;
 
-/* [3D Print] */
-
-// This has only an effect if setting show_label_only is set
-lay_flat = false;
-
 /* [Settings] */
 
-flat  = false;
+flat = false;
 
 /* [Measure] */
 
@@ -26,9 +29,6 @@ wall      = 1.5;
 wall_side = 2.5;
 slot      = 1.5;
 
-lattice_diameter = 6;
-lattice_bottom_distance = -2.5;
-
 gap        = 0.1;
 gap_paper  = 0.5;
 
@@ -36,10 +36,13 @@ chamfer_factor = 0.8;
 
 snap_depth    =  0.5;
 
+lattice_diameter        =  5.8;
+lattice_bottom_distance = -2.5;
+
 /* [Hidden] */
 
 include <banded.scad>
-include <helper.scad>
+include <../helper.scad>
 
 paper_size  = [90, 90/2];
 paper_space = paper_size + [1,1]*2*gap_paper;
@@ -75,34 +78,10 @@ if (!show_label_only && show_paper)
 }
 if (!show_label_only && show_lattice)
 {
-	length      = 404;
-	depth       = 200;
-	lattice_bottom_diameter =  9;
-	lattice_distance        = 20;
-	lattice_height          = 41;
-	
 	color ("lightgrey", 0.5) %
-	union()
-	{
-		translate_z (label_size.y/2)
-		rotate_y    (90)
-		cylinder_extend (h=length, d=lattice_diameter       , align=Y+X, $fn=48);
-		//
-		translate_z (label_size.y/2 - lattice_height)
-		translate_y (-lattice_bottom_distance)
-		rotate_y    (90)
-		cylinder_extend (h=length, d=lattice_bottom_diameter, align=Y-X, $fn=48);
-		//
-		for (i=[0:1:floor(length/lattice_distance/2)-1])
-		{
-		mirror_copy_x()
-		translate_x ((i+0.5) * lattice_distance)
-		translate_z (label_size.y/2 - lattice_height + lattice_bottom_diameter)
-		translate_y (-lattice_bottom_distance + lattice_bottom_diameter/2)
-		rotate_x    (-90)
-		cylinder_extend (h=depth, d=lattice_diameter, align=Z);
-		}
-	}
+	translate   ([0,-lattice_bottom_distance,-lattice_diameter])
+	translate_z (label_size.y/2)
+	lattice ();
 }
 
 // - Modules:

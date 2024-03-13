@@ -76,6 +76,42 @@ module connection (length, height, depth, snap_depth, gap=0, height_extra=0)
 	}
 }
 
+// Lattice grid for refrigerator
+module lattice ()
+{
+	length      = 404;
+	depth       = 200;
+	lattice_bottom_diameter =  9;
+	lattice_diameter        = is_undef(clips_diameter) ? 5.8 : clips_diameter;
+	lattice_grid_diameter   =  4.5;
+	lattice_distance        = 12;
+	lattice_height          = 41;
+	lattice_bottom_distance = is_undef(lattice_bottom_distance) ? 0 : lattice_bottom_distance; //-2.5;
+	
+//	translate ([0, 0                      , lattice_diameter/4])
+	translate ([0, lattice_bottom_distance, lattice_diameter  ])
+	union()
+	{
+		rotate_y    (90)
+		cylinder_extend (h=length, d=lattice_diameter       , align=Y+X, $fn=48);
+		//
+		translate_z (-lattice_height)
+		translate_y (-lattice_bottom_distance)
+		rotate_y    (90)
+		cylinder_extend (h=length, d=lattice_bottom_diameter, align=Y-X, $fn=48);
+		//
+		for (i=[0:1:floor(length/lattice_distance/2)-1])
+		{
+		mirror_copy_x()
+		translate_x ((i+0.5) * lattice_distance)
+		translate_z (-lattice_height          + lattice_bottom_diameter)
+		translate_y (-lattice_bottom_distance + lattice_bottom_diameter/2)
+		rotate_x    (-90)
+		cylinder_extend (h=depth, d=lattice_grid_diameter, align=Z);
+		}
+	}
+}
+
 
 // - Hilfsmodule, könnten möglicherweise zur Bibliothek hinzugefügt werden:
 

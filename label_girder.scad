@@ -1,19 +1,22 @@
+// Creates a label for a regal,
+// mounted on a girder which holds the board.
+//
 
-/* [Display] */
+/* [3D Print] */
 
 show_parts = 0; // [ 0:"Complete", 1:"Top part", 2:"Bottom part", 3:"Both parts together" ]
 
 // if set, the model will lay flat and the other environmental parts will not shown
-show_label_only = true;
+show_label_only = false;
+
+// If set, this will rotate this object 3d printable. (available if setting show_label_only is set)
+lay_flat        = false;
+
+/* [Display] */
 
 show_paper   = true;
 show_girder  = true;
 show_magnets = true;
-
-/* [3D Print] */
-
-// This has only an effect if setting show_label_only is set
-lay_flat = false;
 
 /* [Settings] */
 
@@ -33,7 +36,7 @@ slot      = 1.5;
 
 girder_edge_radius = 5;
 
-gap        = 0.1;
+gap        = 0.12;
 gap_paper  = 0.5;
 gap_magnet = 0.05;
 
