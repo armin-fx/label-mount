@@ -1,5 +1,6 @@
 include <banded.scad>
 
+required_version ([2,7,0]);
 
 // - Projektspezifische Module:
 
@@ -134,75 +135,3 @@ function spread (line, count, width=0, between=false) =
 	         : [ for (i=[0:1:count-2]) lerp (line[0],line[1], width/2 + (i+0.5)*length_segment , length) ]
 ;
 
-// - gap     = the gap between both parts
-// - balance = balance between inner and outer parts '-1 ... 0 ... 1'
-//              0 = carve out both parts half, default
-//             -1 = carve only inner part
-//             +1 = carve only outer part
-module split_both (gap=0, balance=0)
-{
-	split_outer(gap, balance) { children(0); children([1:1:$children-1]); }
-	split_inner(gap, balance) { children(0); children([1:1:$children-1]); }
-}
-
-module split_outer (gap=0, balance=0)
-{
-	d = gap * (balance+1);
-	n = get_slices_circle_current_x (d/2, $fn_min=12);
-	//
-	difference()
-	{
-		children([1:1:$children-1]);
-		//
-		minkowski(convexity=4)
-		{
-			children(0);
-			//
-			if (d>0)
-		//	sphere (d=d, $fn=12); /*
-			rotate_extrude ($fn=n)
-			difference()
-			{
-				circle(d=d);
-				translate(-[d+extra,d/2+extra])
-				square([d+extra,d+2*extra]);
-			} //*/
-		}
-	}
-}
-
-module split_inner (gap=0, balance=0)
-{
-	d = gap * (1-balance);
-	n = get_slices_circle_current_x (d/2, $fn_min=12);
-	//
-	intersection()
-	{
-		children([1:1:$children-1]);
-		//
-		minkowski_difference(convexity=4)
-		{
-			children(0);
-			//
-			if (d>0)
-		//	sphere (d=d, $fn=12); /*
-			rotate_extrude ($fn=n)
-			difference()
-			{
-				circle(d=d);
-				translate(-[d+extra,d/2+extra])
-				square([d+extra,d+2*extra]);
-			} //*/
-		}
-	}
-}
-
-module select (i)
-{
-	if (i!=undef && is_num(i))
-	    if (i>=0) children (i);
-		else      children ($children-i);
-	else if (i!=undef && is_list(i))
-		for (j=i) children (j);
-	else          children ();
-}

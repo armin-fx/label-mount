@@ -24,7 +24,7 @@ required_version ([2,2,0]);
 
 //!tooth_silhouette(wall, wall_side);
 
-select (show_parts)
+select_object (show_parts)
 {
 	model();
 	split_outer(gap) { split_base(); model(); }

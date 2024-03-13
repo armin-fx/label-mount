@@ -61,7 +61,7 @@ rotate_x (
 		lay_flat ? 180
 		         :   0
 	: 90 )
-select (show_parts)
+select_object (show_parts)
 {
 	label();
 	split_outer(gap) { split_base(); label(); }

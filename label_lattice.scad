@@ -41,8 +41,9 @@ snap_depth    =  0.5;
 lattice_bottom_distance = -2.5;
 
 clips_diameter   = 5.8;
+clips_wall       = 2.0;
 clips_width      = 10;
-clips_snap_width = 0.3;
+clips_snap_width = 0.4;
 
 /* [Hidden] */
 
@@ -70,7 +71,7 @@ rotate_x (
 		lay_flat ? 180
 		         :   0
 	: 90 )
-select (show_parts)
+select_object (show_parts)
 {
 	label();
 	split_outer(gap) { split_base(); label(); }
@@ -105,7 +106,7 @@ module label ()
 			cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], align=Z
 				,edges= flat==true
 					? configure_edges (default=1, r=chamfer, bottom=1)
-					: configure_edges (default=1, r=chamfer, bottom=[1,1,0.75,1])
+					: configure_edges (default=1, r=chamfer, bottom=[1,1,1,1])
 				);
 			
 			// clips
@@ -119,13 +120,16 @@ module label ()
 				//
 				bevel_angle = 45;
 				//
-				clips_angle_gap   = 2 * acos( (clips_diameter - clips_snap_width) / (clips_diameter + 2*gap_clips) );
-				clips_angle       = 180 + clips_angle_gap;
+				clips_angle     = 360 - achord( (clips_diameter - clips_snap_width) / (clips_diameter/2 + gap_clips) );
+				clips_angle_gap = clips_angle - 180;
 				clips_angle_begin =
 					270 - atan(
 						(  clips_diameter/2 + lattice_bottom_distance + chamfer_dist)
 						/ (clips_diameter/2)
 					) ;
+				
+				echo ("clips wall", side_dist);
+				echo ("clips angle", clips_angle, clips_angle_gap, clips_angle_begin);
 				
 				mirror_copy_x()
 				// position on side
@@ -185,10 +189,10 @@ module label ()
 					union ()
 					{
 						cylinder_extend (h=clips_width, d=side_dist-gap_clips
-							, angle=[180-clips_angle_gap-16, 180+clips_angle_gap+16]
+							, angle=[180-(clips_angle_gap+16), 180+clips_angle_gap+16]
 							, align=X );
 						cylinder_extend (h=clips_width, d=side_dist-gap_clips
-							, angle=[    clips_angle_gap+16, 180]
+							, angle=[     clips_angle_gap+16 , 180]
 							, align=X, slices=1 );
 					}
 					
