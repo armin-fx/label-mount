@@ -151,39 +151,40 @@ if (!show_label_only && show_girder)
 module label ()
 {
 	color ("gold")
-	difference()
+	combine()
 	{
-		union()
+		// outer hull
+		part_main()
+		cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], align=Z
+			,edges= snag==false
+				? configure_edges (default=1, r=chamfer, bottom=1)
+				: configure_edges (default=1, r=chamfer, bottom=[0,1,0,1])
+			);
+		
+		// snag
+		if (snag)
+		part_add()
+		mirror_copy_y()
+		translate_y (label_size.y/2)
+		difference()
 		{
-			// outer hull
-			cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], align=Z
-				,edges= snag==false
-					? configure_edges (default=1, r=chamfer, bottom=1)
-					: configure_edges (default=1, r=chamfer, bottom=[0,1,0,1])
-				);
-			
-			// snag
-			if (snag)
-			mirror_copy_y()
-			translate_y (label_size.y/2)
-			difference()
-			{
-				width = label_size.x - 2*wall*(chamfer_factor/sqrt(2));
-				cube_extend ([width, girder_edge_radius, girder_edge_radius/3]
-					, align=-Z-Y );
-				//
-				rotate_y(90)
-				cylinder_extend (r=girder_edge_radius, h=width+2*extra
-					, align=X-Y
-					, outer=1, $fn=12*4 );
-			}
+			width = label_size.x - 2*wall*(chamfer_factor/sqrt(2));
+			cube_extend ([width, girder_edge_radius, girder_edge_radius/3]
+				, align=-Z-Y );
+			//
+			rotate_y(90)
+			cylinder_extend (r=girder_edge_radius, h=width+2*extra
+				, align=X-Y
+				, outer=1, $fn=12*4 );
 		}
-		//
+		
 		// paper slot
+		part_cut()
 		translate_z (wall)
 		cube_extend ([paper_space.x, paper_space.y, slot], align=Z);
-		//
+		
 		// slot right
+		part_cut()
 		difference()
 		{
 			translate ([paper_space.x/2-extra,0,wall])
@@ -193,9 +194,10 @@ module label ()
 			cube_chamfer ([(label_size.x-paper_space.x)/2, paper_space.y+2*extra, slot_snap_height+extra], align=-Z+X,
 				edges=configure_edges (r=slot_snap_height*sqrt(2), bottom=[0,1,0,1]));
 		}
-		//
+		
 		// frame window
 		frame_size =  [paper_size.x-2*frame   , paper_size.y-2*frame   , wall+2*extra];
+		part_cut()
 		translate_z (wall+slot-extra)
 		render(convexity=2)
 		union()
@@ -207,9 +209,10 @@ module label ()
 				( square_curve ([frame_size.x,frame_size.y], align=[0,0]) )
 				triangle ([2*wall,wall], side=3);
 		}
-		//
+		
 		// magnet holes
 		if (magnets)
+		part_cut()
 		place_copy (magnet_pos)
 		translate_z (-extra)
 		cylinder (h=magnet_thickness+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
@@ -220,6 +223,7 @@ module label ()
 		segment         = steg_width+honeycomb_width;
 		k = cos(30);
 		if (save_space && space_height>0)
+		part_cut()
 		difference()
 		{
 			intersection()
