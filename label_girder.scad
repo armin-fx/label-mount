@@ -20,8 +20,8 @@ show_magnets = true;
 
 /* [Settings] */
 
-// If set, generate no snag into the rounded edge from the girder
-flat = false;
+// Generate a snag into the rounded edge from the girder
+snag = true;
 
 magnets = true;
 magnet_count = 4; // [2:1:4]
@@ -36,6 +36,7 @@ frame  =  5;
 wall      = 1.5;
 wall_side = 2.5;
 slot      = 1.5;
+slot_snap_height = 0.3;
 
 girder_edge_radius = 5;
 
@@ -44,6 +45,8 @@ gap_paper  = 0.5;
 gap_magnet = 0.05;
 
 chamfer_factor = 0.8;
+
+paper_thickness = 0.1;
 
 magnet_thickness = 1.0;
 magnet_diameter  = 10.1;
@@ -107,8 +110,8 @@ if (!show_label_only && show_paper)
 {
 	color ("white") %
 	rotate_x(90)
-	translate_z (wall + 0.1)
-	cube_extend ([paper_size.x, paper_size.y, 0.2], align=Z);
+	translate_z (wall + paper_thickness)
+	cube_extend ([paper_size.x, paper_size.y, 4*paper_thickness], align=Z);
 }
 if (magnets)
 if (!show_label_only && show_magnets)
@@ -154,13 +157,13 @@ module label ()
 		{
 			// outer hull
 			cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], align=Z
-				,edges= flat==true
+				,edges= snag==false
 					? configure_edges (default=1, r=chamfer, bottom=1)
 					: configure_edges (default=1, r=chamfer, bottom=[0,1,0,1])
 				);
 			
 			// snag
-			if (!flat)
+			if (snag)
 			mirror_copy_y()
 			translate_y (label_size.y/2)
 			difference()
@@ -181,8 +184,15 @@ module label ()
 		cube_extend ([paper_space.x, paper_space.y, slot], align=Z);
 		//
 		// slot right
-		translate ([paper_space.x/2-extra,0,wall])
-		cube_extend ([(label_size.x-paper_space.x)/2+2*extra, paper_space.y, slot], align=Z+X);
+		difference()
+		{
+			translate ([paper_space.x/2-extra,0,wall])
+			cube_extend ([(label_size.x-paper_space.x)/2+2*extra, paper_space.y, slot], align=Z+X);
+			//
+			translate ([paper_space.x/2,0,wall+slot+extra])
+			cube_chamfer ([(label_size.x-paper_space.x)/2, paper_space.y+2*extra, slot_snap_height+extra], align=-Z+X,
+				edges=configure_edges (r=slot_snap_height*sqrt(2), bottom=[0,1,0,1]));
+		}
 		//
 		// frame window
 		frame_size =  [paper_size.x-2*frame   , paper_size.y-2*frame   , wall+2*extra];

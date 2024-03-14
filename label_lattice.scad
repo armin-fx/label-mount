@@ -19,7 +19,7 @@ show_lattice = true;
 
 /* [Settings] */
 
-flat = false;
+clips = true;
 
 /* [Measure] */
 
@@ -28,7 +28,7 @@ frame  =  3;
 wall      = 1.5;
 wall_side = 2.5;
 slot      = 1.5;
-slot_snap_height = 0.2;
+slot_snap_height = 0.3;
 
 gap        = 0.1;
 gap_paper  = 0.5;
@@ -37,6 +37,8 @@ gap_clips  = 0.1;
 chamfer_factor = 0.8;
 
 snap_depth    =  0.5;
+
+paper_thickness = 0.1;
 
 lattice_bottom_distance = -2.5;
 
@@ -83,8 +85,8 @@ if (!show_label_only && show_paper)
 {
 	color ("white") %
 	rotate_x(90)
-	translate_z (wall + 0.1)
-	cube_extend ([paper_size.x, paper_size.y, 0.2], align=Z);
+	translate_z (wall + paper_thickness)
+	cube_extend ([paper_size.x, paper_size.y, 3*paper_thickness], align=Z);
 }
 if (!show_label_only && show_lattice)
 {
@@ -104,13 +106,11 @@ module label ()
 		{
 			// outer hull
 			cube_chamfer ([label_size.x, label_size.y, wall+slot+wall], align=Z
-				,edges= flat==true
-					? configure_edges (default=1, r=chamfer, bottom=1)
-					: configure_edges (default=1, r=chamfer, bottom=[1,1,1,1])
+				,edges=configure_edges (default=1, r=chamfer, bottom=1)
 				);
 			
 			// clips
-			if (!flat)
+			if (clips)
 			{
 				$fd = $preview ? 0.02 : 0.005;
 				under                = wall*chamfer_factor;
