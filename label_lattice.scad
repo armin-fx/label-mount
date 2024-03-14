@@ -21,6 +21,8 @@ show_lattice = true;
 
 clips = true;
 
+paper_folding_template = true;
+
 /* [Measure] */
 
 height = 35;
@@ -46,6 +48,8 @@ clips_diameter   = 5.8;
 clips_wall       = 2.0;
 clips_width      = 10;
 clips_snap_width = 0.4;
+
+paper_folding_template_height = 0.5;
 
 /* [Hidden] */
 
@@ -227,6 +231,25 @@ module label ()
 				
 			}
 		}
+		
+		// paper folding template
+		if (paper_folding_template)
+		part_add()
+		{
+			chamfer_dist = chamfer * sqrt(1/2);
+			mark_pos     = -label_size.y/2 + chamfer_dist + paper_size.y - paper_thickness/2;
+			mark_width   = (label_size.y/2 - chamfer_dist) - mark_pos;
+			//
+			translate_y (mark_pos)
+			cube_chamfer  ([paper_size.x, mark_width*1/3, paper_folding_template_height], align=-Z+Y
+				, edges=[0,1,0,1] * paper_folding_template_height
+				);
+			//
+			translate_y (mark_pos + mark_width*1/3)
+			wedge_chamfer ([paper_size.x, mark_width*2/3, paper_folding_template_height], align=-Z+Y
+				, side=4, edges=[0,0,0, 0,1,0, 0,1,0] * paper_folding_template_height
+				);
+		}
 }	}
 
 module split_base()
@@ -234,8 +257,9 @@ combine()
 {
 	// paper plate
 	part_main()
-	translate_z (-gap -extra)
-	cube_extend ([paper_space.x, paper_space.y, wall +2*gap +2*extra], align=Z);
+	translate_z (-paper_folding_template_height -gap -extra)
+	cube_extend ([paper_space.x, paper_space.y, wall +paper_folding_template_height +2*gap +2*extra]
+		, align=Z);
 	
 	// slot right
 	part_add()
@@ -255,6 +279,6 @@ combine()
 	// snap top
 	translate_xy ([paper_space.x/2, paper_space.y/2])
 	rotate_z(180)
-	connection (paper_space.x, wall, wall_side, snap_depth, gap);
+	connection (paper_space.x, wall, wall_side, snap_depth, gap, -paper_folding_template_height);
 }
 
