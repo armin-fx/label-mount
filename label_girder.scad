@@ -161,23 +161,6 @@ module label ()
 				: configure_edges (default=1, r=chamfer, bottom=[0,1,0,1])
 			);
 		
-		// snag
-		if (snag)
-		part_add()
-		mirror_copy_y()
-		translate_y (label_size.y/2)
-		difference()
-		{
-			width = label_size.x - 2*wall*(chamfer_factor/sqrt(2));
-			cube_extend ([width, girder_edge_radius, girder_edge_radius/3]
-				, align=-Z-Y );
-			//
-			rotate_y(90)
-			cylinder_extend (r=girder_edge_radius, h=width+2*extra
-				, align=X-Y
-				, outer=1, $fn=12*4 );
-		}
-		
 		// paper slot
 		part_cut()
 		translate_z (wall)
@@ -210,13 +193,30 @@ module label ()
 				triangle ([2*wall,wall], side=3);
 		}
 		
+		// snag
+		if (snag)
+		part_add()
+		mirror_copy_y()
+		translate_y (label_size.y/2)
+		difference()
+		{
+			width = label_size.x - 2*wall*(chamfer_factor/sqrt(2));
+			cube_extend ([width, girder_edge_radius, girder_edge_radius/3]
+				, align=-Z-Y );
+			//
+			rotate_y(90)
+			cylinder_extend (r=girder_edge_radius, h=width+2*extra
+				, align=X-Y
+				, outer=1, $fn=12*4 );
+		}
+		
 		// magnet holes
 		if (magnets)
 		part_cut()
 		place_copy (magnet_pos)
 		translate_z (-extra)
 		cylinder (h=magnet_thickness+extra, d=magnet_diameter+2*gap_magnet, $fn=48);
-		//
+		
 		// save space - generate a grid on backplate with half wall
 		space_height    = wall * space_depth_ratio*percent;
 		steg_width      = wall * 1.5;

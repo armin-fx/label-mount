@@ -108,6 +108,38 @@ module label ()
 			,edges=configure_edges (default=1, r=chamfer, bottom=1)
 			);
 		
+		// paper slot
+		part_cut()
+		translate_z (wall)
+		cube_extend ([paper_space.x, paper_space.y, slot], align=Z);
+		
+		// slot right
+		part_cut()
+		difference()
+		{
+			translate ([paper_space.x/2-extra,0,wall])
+			cube_extend ([(label_size.x-paper_space.x)/2+2*extra, paper_space.y, slot], align=Z+X);
+			//
+			translate ([paper_space.x/2,0,wall+slot+extra])
+			cube_chamfer ([(label_size.x-paper_space.x)/2, paper_space.y+2*extra, slot_snap_height+extra], align=-Z+X,
+				edges=configure_edges (r=slot_snap_height*sqrt(2), bottom=[0,1,0,1]));
+		}
+		
+		// frame window
+		frame_size =  [paper_size.x-2*frame   , paper_size.y-2*frame   , wall+2*extra];
+		part_cut()
+		translate_z (wall+slot-extra)
+		render(convexity=2)
+		union()
+		{
+			cube_extend (frame_size, align=Z);
+			//
+			translate_z (wall*3/5)
+			plain_trace_extrude_closed
+				( square_curve ([frame_size.x,frame_size.y], align=[0,0]) )
+				triangle ([2*wall,wall], side=3);
+		}
+		
 		// clips
 		if (clips)
 		part_add()
@@ -195,40 +227,7 @@ module label ()
 				
 			}
 		}
-		
-		// paper slot
-		part_cut()
-		translate_z (wall)
-		cube_extend ([paper_space.x, paper_space.y, slot], align=Z);
-		
-		// slot right
-		part_cut()
-		difference()
-		{
-			translate ([paper_space.x/2-extra,0,wall])
-			cube_extend ([(label_size.x-paper_space.x)/2+2*extra, paper_space.y, slot], align=Z+X);
-			//
-			translate ([paper_space.x/2,0,wall+slot+extra])
-			cube_chamfer ([(label_size.x-paper_space.x)/2, paper_space.y+2*extra, slot_snap_height+extra], align=-Z+X,
-				edges=configure_edges (r=slot_snap_height*sqrt(2), bottom=[0,1,0,1]));
-		}
-		
-		// frame window
-		frame_size =  [paper_size.x-2*frame   , paper_size.y-2*frame   , wall+2*extra];
-		part_cut()
-		translate_z (wall+slot-extra)
-		render(convexity=2)
-		union()
-		{
-			cube_extend (frame_size, align=Z);
-			//
-			translate_z (wall*3/5)
-			plain_trace_extrude_closed
-				( square_curve ([frame_size.x,frame_size.y], align=[0,0]) )
-				triangle ([2*wall,wall], side=3);
-		}
-	}
-}
+}	}
 
 module split_base()
 combine()
