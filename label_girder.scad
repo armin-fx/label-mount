@@ -24,7 +24,7 @@ show_magnets = true;
 flat = false;
 
 magnets = true;
-magnet_count = 2;
+magnet_count = 4; // [2:1:4]
 
 // If set, generate a groundplate with thinner honeycomp spaces
 save_space = true;
