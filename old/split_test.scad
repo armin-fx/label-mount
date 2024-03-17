@@ -17,7 +17,7 @@ width=20;
 /*[Hidden]*/
 
 include <banded.scad>
-include <helper.scad>
+include <../helper.scad>
 
 // test BandedScad version
 required_version ([2,2,0]);

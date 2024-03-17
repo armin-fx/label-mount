@@ -1,5 +1,3 @@
-include <banded.scad>
-include <helper.scad>
 
 diameter = 6;
 wall     = 2;
@@ -8,10 +6,15 @@ depth    = 10;
 
 bevel_angle = 45;
 
+/* [Hidden] */
+
+include <banded.scad>
+include <../helper.scad>
+
 $fd = $preview ? 0.02 : 0.005;
 diameter_outer = diameter + 2*wall;
 
-for (i=[0:5])
+for (i=[0:9])
 {
 	clips_snap_width = i * 0.1;
 	
@@ -20,14 +23,15 @@ for (i=[0:5])
 
 	echo(i, angle);
 	
-	translate_y(i * (diameter+wall*2))
+	translate_y(i * (diameter+wall*2 + 1))
 	difference()
 	{
 		translate_z (diameter_outer/2)
 		rotate_y    (90)
-	//	rotate_z    (-bevel_angle) // <--
+		rotate_z    (-bevel_angle) // <--
 		union()
 		{
+			mirror_copy(X-Y) // <--
 			translate_x (diameter_outer/2)
 			translate_y (tan(bevel_angle/2) * diameter_outer/2)
 			union()
@@ -43,15 +47,15 @@ for (i=[0:5])
 			ring_square (h=depth
 				, di=diameter+2*gap
 				, do=diameter+2*wall
-				, angle= [360-angle, 0]
+				, angle= [360-angle, -45]
 				);
 		}
 		//
-		translate_x(2) mirror_x() rotate_z(90)
-	//	translate_x(2) translate_y(-1.75) mirror_x() rotate_z(90)
+	//	translate_x(2) mirror_x() rotate_z(90)
+		translate_x(2) translate_y(-1.75) mirror_x() rotate_z(90)
 		translate_z(-extra) linear_extrude(0.5+extra)
 		scale(0.27)
-		text(str(i));
+		text(str(i), font=":bold");
 	}
 }
 
