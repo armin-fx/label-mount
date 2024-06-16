@@ -63,6 +63,9 @@ space_depth_ratio = 50 ;
 include <banded.scad>
 include <helper.scad>
 
+// test BandedScad version
+required_version ([3,0,0]);
+
 paper_size  = [ISO_A4.x, ISO_A4.y/4];
 paper_space = paper_size + [1,1]*2*gap_paper;
 label_size  = [paper_size.x+2*wall_side, height];
@@ -87,9 +90,6 @@ magnet_pos =
 		]:
 	[];
 
-// test BandedScad version
-required_version ([2,2,0]);
-
 // - Compose object with optional environment:
 
 // object_slice(Z, wall+extra ,extra)
@@ -108,7 +108,7 @@ select_object (show_parts)
 
 if (!show_label_only && show_paper)
 {
-	color ("white") %
+	virtual ("white", alpha=1)
 	rotate_x(90)
 	translate_z (wall + paper_thickness)
 	cube_extend ([paper_size.x, paper_size.y, 4*paper_thickness], align=Z);
@@ -116,7 +116,7 @@ if (!show_label_only && show_paper)
 if (magnets)
 if (!show_label_only && show_magnets)
 {
-	color ("lightgrey") %
+	virtual ("lightgrey", alpha=1)
 	rotate_x(90)
 	place_copy (magnet_pos)
 	cylinder_edges_rounded (h=magnet_thickness, d=magnet_diameter, $fn=48
@@ -129,7 +129,7 @@ if (!show_label_only && show_girder)
 	thickness   =  17;
 	wall_girder =   1;
 	
-	color ("blue", 0.5) %
+	virtual ("blue")
 	render()
 	difference()
 	{

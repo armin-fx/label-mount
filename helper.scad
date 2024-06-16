@@ -1,6 +1,6 @@
 include <banded.scad>
 
-required_version ([2,7,0]);
+required_version ([3,0,0]);
 
 // - Projektspezifische Module:
 

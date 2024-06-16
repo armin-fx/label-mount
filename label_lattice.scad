@@ -56,6 +56,9 @@ paper_folding_template_height = 0.5;
 include <banded.scad>
 include <helper.scad>
 
+// test BandedScad version
+required_version ([3,0,0]);
+
 paper_size  = [90, 90/3];
 paper_space = paper_size + [1,1]*2*gap_paper;
 label_size  = [paper_size.x+2*wall_side, height];
@@ -65,9 +68,6 @@ label_height = wall + slot + wall;
 chamfer = chamfer_factor * wall;
 
 clips_position = paper_space.x/2 * 3/5 ; // * (1-1/euler);
-
-// test BandedScad version
-required_version ([2,2,0]);
 
 // - Compose object with optional environment:
 
@@ -87,14 +87,14 @@ select_object (show_parts)
 
 if (!show_label_only && show_paper)
 {
-	color ("white") %
+	virtual ("white", alpha=1)
 	rotate_x(90)
 	translate_z (wall + paper_thickness)
 	cube_extend ([paper_size.x, paper_size.y, 3*paper_thickness], align=Z);
 }
 if (!show_label_only && show_lattice)
 {
-	color ("lightgrey", 0.5) %
+	virtual ("lightgrey")
 	translate_z (label_size.y/2)
 	lattice ();
 }
@@ -188,10 +188,10 @@ module label ()
 						, angle=[-clips_angle, clips_angle_begin]
 						, center=true );
 					//
-					part_selfcut()
+					part_cut_self()
 					cube_extend ([clips_width+2*extra,side_dist,label_height], align=-Z-Y);
 					//
-					part_selfcut()
+					part_cut_self()
 					translate   ([0,-chamfer_dist,-label_height])
 					cube_extend ([clips_width+2*extra,chamfer+clips_diameter/2,chamfer_dist], align=+Z+Y);
 				}
@@ -207,7 +207,7 @@ module label ()
 					] );//*/
 				//
 				// cut lattice out with gap
-				part_selfcut_all()
+				part_cut_all()
 				translate (lattice_pos)  rotate_to_vector (X)
 				cylinder_extend (h=clips_width+2*extra, d=clips_diameter+2*gap_clips
 					, angle=[-clips_angle, clips_angle_begin]
