@@ -20,7 +20,7 @@ include <banded.scad>
 include <../helper.scad>
 
 // test BandedScad version
-required_version ([2,2,0]);
+required_version ([3,0,0]);
 
 //!tooth_silhouette(wall, wall_side);
 

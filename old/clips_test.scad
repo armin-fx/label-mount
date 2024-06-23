@@ -11,6 +11,9 @@ bevel_angle = 45;
 include <banded.scad>
 include <../helper.scad>
 
+// test BandedScad version
+required_version ([3,0,0]);
+
 $fd = $preview ? 0.02 : 0.005;
 diameter_outer = diameter + 2*wall;
 
@@ -44,7 +47,7 @@ for (i=[0:9])
 					);
 			}
 
-			ring_square (h=depth
+			tube (h=depth
 				, di=diameter+2*gap
 				, do=diameter+2*wall
 				, angle= [360-angle, -45]
